@@ -32,6 +32,34 @@ const SubjectsList = () => {
           header: () => <p className="column-title ml-2">Code</p>,
           cell: ({ getValue }) => <Badge>{getValue<string>()}</Badge>,
         },
+        {
+          id: "name",
+          accessorKey: "name",
+          size: 200,
+          header: () => <p className="column-title">Name</p>,
+          cell: ({ getValue }) => (
+            <span className="text-foreground">{getValue<string>()}</span>
+          ),
+          filterFn: "includesString",
+        },
+        {
+          id: "department",
+          accessorKey: "department",
+          size: 150,
+          header: () => <p className="column-title">Department</p>,
+          cell: ({ getValue }) => (
+            <Badge variant="secondary">{getValue<string>()}</Badge>
+          ),
+        },
+        {
+          id: "description",
+          name: "description",
+          size: 300,
+          header: () => <p className="column-title">Description</p>,
+          cell: ({ getValue }) => (
+            <span className="truncate line-clamp-2">{getValue<string>()}</span>
+          ),
+        },
       ],
       []
     ),
