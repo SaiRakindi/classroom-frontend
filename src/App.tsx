@@ -22,7 +22,6 @@ import SubjectsCreate from "./pages/subjects/create";
 function App() {
   return (
     <BrowserRouter>
-      <GitHubBanner />
       <RefineKbarProvider>
         <ThemeProvider>
           <DevtoolsProvider>
