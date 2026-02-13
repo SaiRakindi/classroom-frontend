@@ -17,7 +17,7 @@ const MOCK_SUBJECTS: Subject[] = [
     id: 1,
     code: "CS501",
     name: "Advanced Algorithms",
-    department: "Computer Science",
+    department: "CS",
     description:
       "Deep dive into graph theory, dynamic programming, and distributed algorithms.",
   },
@@ -25,7 +25,7 @@ const MOCK_SUBJECTS: Subject[] = [
     id: 2,
     code: "MAT320",
     name: "Applied Linear Algebra",
-    department: "Mathematics",
+    department: "Math",
     description:
       "Matrix factorization and vector spaces with practical data science applications.",
   },
@@ -33,7 +33,7 @@ const MOCK_SUBJECTS: Subject[] = [
     id: 3,
     code: "PHY210",
     name: "Modern Physics",
-    department: "Physics",
+    department: "English",
     description:
       "Covers relativity, quantum theory, and the experimental foundations of physics.",
   },

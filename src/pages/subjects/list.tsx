@@ -53,7 +53,7 @@ const SubjectsList = () => {
         },
         {
           id: "description",
-          name: "description",
+          accessorKey: "description",
           size: 300,
           header: () => <p className="column-title">Description</p>,
           cell: ({ getValue }) => (
@@ -102,10 +102,7 @@ const SubjectsList = () => {
               </SelectTrigger>
 
               <SelectContent>
-                <SelectItem value={selectedDepartment}>
-                  All Departments
-                </SelectItem>
-
+                <SelectItem value="all">All Departments</SelectItem>
                 {DEPARTMENT_OPTIONS.map((department) => (
                   <SelectItem key={department.value} value={department.value}>
                     {department.label}
