@@ -1,10 +1,3 @@
-export const DEPARTMENTS = ["CS", "Math", "English"];
-
-export const DEPARTMENT_OPTIONS = DEPARTMENTS.map((department) => ({
-  value: department,
-  label: department,
-}));
-
 import { GraduationCap, School } from "lucide-react";
 
 export const USER_ROLES = {
@@ -25,6 +18,34 @@ export const ROLE_OPTIONS = [
     icon: School,
   },
 ];
+
+export const DEPARTMENTS = [
+  "Computer Science",
+  "Mathematics",
+  "Physics",
+  "Chemistry",
+  "Biology",
+  "English",
+  "History",
+  "Geography",
+  "Economics",
+  "Business Administration",
+  "Engineering",
+  "Psychology",
+  "Sociology",
+  "Political Science",
+  "Philosophy",
+  "Education",
+  "Fine Arts",
+  "Music",
+  "Physical Education",
+  "Law",
+] as const;
+
+export const DEPARTMENT_OPTIONS = DEPARTMENTS.map((dept) => ({
+  value: dept,
+  label: dept,
+}));
 
 export const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB in bytes
 export const ALLOWED_TYPES = [
