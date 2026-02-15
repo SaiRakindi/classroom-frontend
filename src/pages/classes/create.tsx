@@ -1,15 +1,17 @@
-import { Breadcrumb } from "@/components/refine-ui/layout/breadcrumb";
-import { CreateView } from "@/components/refine-ui/views/create-view";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import { CreateView } from "@/components/refine-ui/views/create-view.tsx";
+import { Breadcrumb } from "@/components/refine-ui/layout/breadcrumb.tsx";
+import { Button } from "@/components/ui/button.tsx";
 import { useBack } from "@refinedev/core";
-
+import { Separator } from "@/components/ui/separator.tsx";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card.tsx";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import { useForm } from "react-hook-form";
-import { classSchema } from "@/lib/schema";
-
+import { classSchema } from "@/lib/schema.ts";
 import * as z from "zod";
 
 import {
@@ -21,28 +23,17 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label.tsx";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-
-export const teachers = [
-  { id: "1", name: "John Doe" },
-  { id: "2", name: "Jane Smith" },
-  { id: "3", name: "Dr. Alan Turing" },
-];
-
-export const subjects = [
-  { id: 1, name: "Mathematics", code: "MATH" },
-  { id: 2, name: "Computer Science", code: "CS" },
-  { id: 3, name: "Physics", code: "PHY" },
-  { id: 4, name: "Chemistry", code: "CHEM" },
-];
+} from "@/components/ui/select.tsx";
+import { Textarea } from "@/components/ui/textarea.tsx";
+import { Loader2 } from "lucide-react";
 
 const Create = () => {
   const back = useBack();
@@ -60,26 +51,50 @@ const Create = () => {
 
   const {
     handleSubmit,
-    formState: { isSubmitting, control },
+    formState: { isSubmitting },
+    control,
   } = form;
 
-  const onSubmit = (values: z.infer<typeof classSchema>) => {
+  const onSubmit = async (values: z.infer<typeof classSchema>) => {
     try {
       console.log(values);
     } catch (error) {
-      console.log("error", error);
+      console.error("Error creating class:", error);
     }
   };
+
+  const teachers = [
+    {
+      id: 1,
+      name: "John Doe",
+    },
+    {
+      id: 2,
+      name: "Jane Doe",
+    },
+  ];
+
+  const subjects = [
+    {
+      id: 1,
+      name: "Math",
+      code: "MATH",
+    },
+    {
+      id: 2,
+      name: "English",
+      code: "ENG",
+    },
+  ];
 
   return (
     <CreateView className="class-view">
       <Breadcrumb />
 
       <h1 className="page-title">Create a Class</h1>
-
       <div className="intro-row">
         <p>Provide the required information below to add a class.</p>
-        <Button onClick={back}>Go Back</Button>
+        <Button onClick={() => back()}>Go Back</Button>
       </div>
 
       <Separator />
@@ -87,8 +102,8 @@ const Create = () => {
       <div className="my-4 flex items-center">
         <Card className="class-form-card">
           <CardHeader className="relative z-10">
-            <CardTitle className="text-2xl pb-0 font-bold">
-              Fill out the form
+            <CardTitle className="text-2xl pb-0 font-bold text-gradient-orange">
+              Fill out form
             </CardTitle>
           </CardHeader>
 
@@ -99,15 +114,15 @@ const Create = () => {
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                 <div className="space-y-3">
                   <Label>
-                    Banner Image
-                    <span className="text-orange-600">*</span>
+                    Banner Image <span className="text-orange-600">*</span>
                   </Label>
 
                   <p>Upload image widget</p>
                 </div>
+
                 <FormField
                   control={control}
-                  name="username"
+                  name="name"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>
@@ -119,11 +134,11 @@ const Create = () => {
                           {...field}
                         />
                       </FormControl>
-
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+
                 <div className="grid sm:grid-cols-2 gap-4">
                   <FormField
                     control={control}
@@ -133,12 +148,11 @@ const Create = () => {
                         <FormLabel>
                           Subject <span className="text-orange-600">*</span>
                         </FormLabel>
-
                         <Select
                           onValueChange={(value) =>
                             field.onChange(Number(value))
                           }
-                          value={field?.value?.toString()}
+                          value={field.value?.toString()}
                         >
                           <FormControl>
                             <SelectTrigger className="w-full">
@@ -148,15 +162,14 @@ const Create = () => {
                           <SelectContent>
                             {subjects.map((subject) => (
                               <SelectItem
-                                value={subject.id.toString()}
                                 key={subject.id}
+                                value={subject.id.toString()}
                               >
                                 {subject.name} ({subject.code})
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
-
                         <FormMessage />
                       </FormItem>
                     )}
@@ -170,12 +183,9 @@ const Create = () => {
                         <FormLabel>
                           Teacher <span className="text-orange-600">*</span>
                         </FormLabel>
-
                         <Select
-                          onValueChange={(value) =>
-                            field.onChange(Number(value))
-                          }
-                          value={field?.value?.toString()}
+                          onValueChange={field.onChange}
+                          value={field.value}
                         >
                           <FormControl>
                             <SelectTrigger className="w-full">
@@ -185,21 +195,103 @@ const Create = () => {
                           <SelectContent>
                             {teachers.map((teacher) => (
                               <SelectItem
-                                value={teacher.id.toString()}
                                 key={teacher.id}
+                                value={teacher.id.toString()}
                               >
                                 {teacher.name}
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
-
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
-                <Button type="submit">Submit</Button>
+
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <FormField
+                    control={control}
+                    name="capacity"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Capacity</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            placeholder="30"
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              field.onChange(value ? Number(value) : undefined);
+                            }}
+                            value={(field.value as number | undefined) ?? ""}
+                            name={field.name}
+                            ref={field.ref}
+                            onBlur={field.onBlur}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={control}
+                    name="status"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Status <span className="text-orange-600">*</span>
+                        </FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Select status" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="active">Active</SelectItem>
+                            <SelectItem value="inactive">Inactive</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Brief description about the class"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Separator />
+
+                <Button type="submit" size="lg" className="w-full">
+                  {isSubmitting ? (
+                    <div className="flex gap-1">
+                      <span>Creating Class...</span>
+                      <Loader2 className="inline-block ml-2 animate-spin" />
+                    </div>
+                  ) : (
+                    "Create Class"
+                  )}
+                </Button>
               </form>
             </Form>
           </CardContent>
