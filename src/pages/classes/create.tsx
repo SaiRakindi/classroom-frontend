@@ -164,11 +164,11 @@ const Create = () => {
 
                   <FormField
                     control={control}
-                    name="subjectId"
+                    name="teacherId"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          Subject <span className="text-orange-600">*</span>
+                          Teacher <span className="text-orange-600">*</span>
                         </FormLabel>
 
                         <Select
@@ -179,16 +179,16 @@ const Create = () => {
                         >
                           <FormControl>
                             <SelectTrigger className="w-full">
-                              <SelectValue placeholder="Select a subject" />
+                              <SelectValue placeholder="Select a teacher" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {subjects.map((subject) => (
+                            {teachers.map((teacher) => (
                               <SelectItem
-                                value={subject.id.toString()}
-                                key={subject.id}
+                                value={teacher.id.toString()}
+                                key={teacher.id}
                               >
-                                {subject.name} ({subject.code})
+                                {teacher.name}
                               </SelectItem>
                             ))}
                           </SelectContent>
