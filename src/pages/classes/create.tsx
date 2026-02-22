@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/select.tsx";
 import { Textarea } from "@/components/ui/textarea.tsx";
 import { Loader2 } from "lucide-react";
+import UploadWidget from "@/components/upload-widget";
 
 const Create = () => {
   const back = useBack();
@@ -43,9 +44,6 @@ const Create = () => {
     refineCoreProps: {
       resource: "classes",
       action: "create",
-    },
-    defaultValues: {
-      status: "active",
     },
   });
 
@@ -87,6 +85,24 @@ const Create = () => {
     },
   ];
 
+  const bannerPublicId = form.watch("bannerCldPubid");
+
+  const setBannerImage = (file: any, field: any) => {
+    if (file) {
+      field.onChange(file.url);
+      form.setValue("bannerCldPubId", file.publicId, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    } else {
+      field.onChange("");
+      form.setValue("bannerClcdPubId", "", {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    }
+  };
+
   return (
     <CreateView className="class-view">
       <Breadcrumb />
@@ -112,13 +128,37 @@ const Create = () => {
           <CardContent className="mt-7">
             <Form {...form}>
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-                <div className="space-y-3">
-                  <Label>
-                    Banner Image <span className="text-orange-600">*</span>
-                  </Label>
+                <FormField
+                  control={control}
+                  name="bannerUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Banner Image
+                        <span className="text-orange-600">*</span>
+                      </FormLabel>
 
-                  <p>Upload image widget</p>
-                </div>
+                      <FormControl>
+                        <UploadWidget
+                          value={
+                            field.value
+                              ? {
+                                  url: field.value,
+                                  publicId: bannerPublicId ?? "",
+                                }
+                              : null
+                          }
+                          onChange={(file: any, field: any) =>
+                            setBannerImage(file, field)
+                          }
+                        />
+                      </FormControl>
+
+                      <FormMessage />
+                      {errors.bannerCldPubId && !errors}
+                    </FormItem>
+                  )}
+                />
 
                 <FormField
                   control={control}
