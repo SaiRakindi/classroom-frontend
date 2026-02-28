@@ -1,35 +1,43 @@
-import { useForm } from "@refinedev/react-hook-form";
+import { CreateView } from "@/components/refine-ui/views/create-view.tsx";
+import { Breadcrumb } from "@/components/refine-ui/layout/breadcrumb.tsx";
+import { Button } from "@/components/ui/button.tsx";
+import { useBack, useList } from "@refinedev/core";
+import { Separator } from "@/components/ui/separator.tsx";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card.tsx";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import { useForm } from "@refinedev/react-hook-form";
+import { classSchema } from "@/lib/schema.ts";
+import * as z from "zod";
+
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label.tsx";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-
-import { CreateView } from "@/components/refine-ui/views/create-view";
-import { Breadcrumb } from "@/components/refine-ui/layout/breadcrumb";
-
-import { Textarea } from "@/components/ui/textarea";
-import { useBack } from "@refinedev/core";
+} from "@/components/ui/select.tsx";
+import { Textarea } from "@/components/ui/textarea.tsx";
 import { Loader2 } from "lucide-react";
-import { classSchema } from "@/lib/schema";
-import UploadWidget from "@/components/upload-widget";
+import UploadWidget from "@/components/upload-widget.tsx";
+import { Subject, User } from "@/types";
 
-const ClassesCreate = () => {
+const Create = () => {
   const back = useBack();
 
   const form = useForm({
@@ -38,56 +46,61 @@ const ClassesCreate = () => {
       resource: "classes",
       action: "create",
     },
-    defaultValues: {
-      name: "",
-      subjectId: undefined,
-      teacherId: undefined,
-      capacity: undefined,
-      description: "",
-      status: "active",
-      bannerUrl: "",
-      bannerCldPubId: "",
-    },
   });
 
   const {
+    refineCore: { onFinish },
     handleSubmit,
     formState: { isSubmitting, errors },
     control,
   } = form;
-  const bannerPublicId = form.watch("bannerCldPubId");
 
-  const onSubmit = async () => {
+  const onSubmit = async (values: z.infer<typeof classSchema>) => {
     try {
-      console.log(form.getValues());
+      await onFinish(values);
     } catch (error) {
       console.error("Error creating class:", error);
     }
   };
 
-  const teachers = [
-    {
-      id: 1,
-      name: "John Doe",
+  const { query: subjectsQuery } = useList<Subject>({
+    resource: "subjects",
+    pagination: {
+      pageSize: 100,
     },
-    {
-      id: 2,
-      name: "Jane Doe",
-    },
-  ];
+  });
 
-  const subjects = [
-    {
-      id: 1,
-      name: "Math",
-      code: "MATH",
+  const { query: teachersQuery } = useList<User>({
+    resource: "users",
+    filters: [{ field: "role", operator: "eq", value: "teacher" }],
+    pagination: {
+      pageSize: 100,
     },
-    {
-      id: 2,
-      name: "English",
-      code: "ENG",
-    },
-  ];
+  });
+
+  const subjects = subjectsQuery?.data?.data || [];
+  const subjectsLoading = subjectsQuery.isLoading;
+
+  const teachers = teachersQuery?.data?.data || [];
+  const teachersLoading = teachersQuery.isLoading;
+
+  const bannerPublicId = form.watch("bannerCldPubId");
+
+  const setBannerImage = (file: any, field: any) => {
+    if (file) {
+      field.onChange(file.url);
+      form.setValue("bannerCldPubId", file.publicId, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    } else {
+      field.onChange("");
+      form.setValue("bannerCldPubId", "", {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    }
+  };
 
   return (
     <CreateView className="class-view">
@@ -132,21 +145,7 @@ const ClassesCreate = () => {
                                 }
                               : null
                           }
-                          onChange={(file) => {
-                            if (file) {
-                              field.onChange(file.url);
-                              form.setValue("bannerCldPubId", file.publicId, {
-                                shouldValidate: true,
-                                shouldDirty: true,
-                              });
-                            } else {
-                              field.onChange("");
-                              form.setValue("bannerCldPubId", "", {
-                                shouldValidate: true,
-                                shouldDirty: true,
-                              });
-                            }
-                          }}
+                          onChange={(file: any) => setBannerImage(file, field)}
                         />
                       </FormControl>
                       <FormMessage />
@@ -192,6 +191,7 @@ const ClassesCreate = () => {
                             field.onChange(Number(value))
                           }
                           value={field.value?.toString()}
+                          disabled={subjectsLoading}
                         >
                           <FormControl>
                             <SelectTrigger className="w-full">
@@ -224,7 +224,8 @@ const ClassesCreate = () => {
                         </FormLabel>
                         <Select
                           onValueChange={field.onChange}
-                          value={field.value?.toString()}
+                          value={field.value}
+                          disabled={teachersLoading}
                         >
                           <FormControl>
                             <SelectTrigger className="w-full">
@@ -254,13 +255,10 @@ const ClassesCreate = () => {
                     name="capacity"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>
-                          Capacity <span className="text-orange-600">*</span>
-                        </FormLabel>
+                        <FormLabel>Capacity</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
-                            min={1}
                             placeholder="30"
                             onChange={(e) => {
                               const value = e.target.value;
@@ -310,9 +308,7 @@ const ClassesCreate = () => {
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>
-                        Description <span className="text-orange-600">*</span>
-                      </FormLabel>
+                      <FormLabel>Description</FormLabel>
                       <FormControl>
                         <Textarea
                           placeholder="Brief description about the class"
@@ -345,4 +341,4 @@ const ClassesCreate = () => {
   );
 };
 
-export default ClassesCreate;
+export default Create;
