@@ -24,10 +24,12 @@ import { CreateView } from "@/components/refine-ui/views/create-view";
 import { Breadcrumb } from "@/components/refine-ui/layout/breadcrumb";
 
 import { Textarea } from "@/components/ui/textarea";
-import { useBack } from "@refinedev/core";
+import { useBack, useList } from "@refinedev/core";
 import { Loader2 } from "lucide-react";
 import { classSchema } from "@/lib/schema";
 import UploadWidget from "@/components/upload-widget";
+import { Subject, User } from "@/types";
+import z from "zod";
 
 const ClassesCreate = () => {
   const back = useBack();
@@ -51,43 +53,42 @@ const ClassesCreate = () => {
   });
 
   const {
+    refineCore: { onFinish },
     handleSubmit,
     formState: { isSubmitting, errors },
     control,
   } = form;
-  const bannerPublicId = form.watch("bannerCldPubId");
 
-  const onSubmit = async () => {
+  const onSubmit = async (values: z.infer<typeof classSchema>) => {
     try {
-      console.log(form.getValues());
+      await onFinish(values);
     } catch (error) {
       console.error("Error creating class:", error);
     }
   };
 
-  const teachers = [
-    {
-      id: 1,
-      name: "John Doe",
+  const { query: subjectsQuery } = useList<Subject>({
+    resource: "subjects",
+    pagination: {
+      pageSize: 100,
     },
-    {
-      id: 2,
-      name: "Jane Doe",
-    },
-  ];
+  });
 
-  const subjects = [
-    {
-      id: 1,
-      name: "Math",
-      code: "MATH",
+  const { query: teachersQuery } = useList<User>({
+    resource: "users",
+    filters: [{ field: "role", operator: "eq", value: "teacher" }],
+    pagination: {
+      pageSize: 100,
     },
-    {
-      id: 2,
-      name: "English",
-      code: "ENG",
-    },
-  ];
+  });
+
+  const subjects = subjectsQuery?.data?.data || [];
+  const subjectsLoading = subjectsQuery.isLoading;
+
+  const teachers = teachersQuery?.data?.data || [];
+  const teachersLoading = teachersQuery.isLoading;
+
+  const bannerPublicId = form.watch("bannerCldPubId");
 
   return (
     <CreateView className="class-view">
@@ -192,6 +193,7 @@ const ClassesCreate = () => {
                             field.onChange(Number(value))
                           }
                           value={field.value?.toString()}
+                          disabled={subjectsLoading}
                         >
                           <FormControl>
                             <SelectTrigger className="w-full">
@@ -224,7 +226,8 @@ const ClassesCreate = () => {
                         </FormLabel>
                         <Select
                           onValueChange={field.onChange}
-                          value={field.value?.toString()}
+                          value={field.value}
+                          disabled={teachersLoading}
                         >
                           <FormControl>
                             <SelectTrigger className="w-full">
