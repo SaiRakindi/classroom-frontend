@@ -1,4 +1,4 @@
-import { GitHubBanner, Refine, WelcomePage } from "@refinedev/core";
+import { GitHubBanner, Refine } from "@refinedev/core";
 import { DevtoolsPanel, DevtoolsProvider } from "@refinedev/devtools";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
 
@@ -11,15 +11,17 @@ import "./App.css";
 import { Toaster } from "./components/refine-ui/notification/toaster";
 import { useNotificationProvider } from "./components/refine-ui/notification/use-notification-provider";
 import { ThemeProvider } from "./components/refine-ui/theme/theme-provider";
-import { dataProvider } from "./providers/data";
-import Dashboard from "./pages/dashboard";
-import { BookOpen, GraduationCap, Home, HomeIcon, List } from "lucide-react";
-import { Layout } from "./components/refine-ui/layout/layout";
-import SubjectsList from "./pages/subjects/list";
-import SubjectsCreate from "./pages/subjects/create";
+import Dashboard from "@/pages/dashboard.tsx";
+import { BookOpen, GraduationCap, Home } from "lucide-react";
+import { Layout } from "@/components/refine-ui/layout/layout.tsx";
+import SubjectsList from "@/pages/subjects/list.tsx";
+import SubjectsCreate from "@/pages/subjects/create.tsx";
 
-import ClassesList from "./pages/classes/list";
-import ClassesCreate from "./pages/classes/create";
+import ClassesList from "@/pages/classes/list.tsx";
+import ClassesCreate from "@/pages/classes/create.tsx";
+import ClassesShow from "@/pages/classes/show.tsx";
+
+import { dataProvider } from "@/providers/data.ts";
 
 function App() {
   return (
@@ -34,7 +36,7 @@ function App() {
               options={{
                 syncWithLocation: true,
                 warnWhenUnsavedChanges: true,
-                projectId: "uF1fuN-WzthQK-biMDXh",
+                projectId: "jtNqZy-1VTAjv-OXwtBn",
               }}
               resources={[
                 {
@@ -52,6 +54,7 @@ function App() {
                   name: "classes",
                   list: "/classes",
                   create: "/classes/create",
+                  show: "/classes/show/:id",
                   meta: { label: "Classes", icon: <GraduationCap /> },
                 },
               ]}
@@ -74,6 +77,7 @@ function App() {
                   <Route path="classes">
                     <Route index element={<ClassesList />} />
                     <Route path="create" element={<ClassesCreate />} />
+                    <Route path="show/:id" element={<ClassesShow />} />
                   </Route>
                 </Route>
               </Routes>
