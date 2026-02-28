@@ -1,22 +1,22 @@
+import { createDataProvider, CreateDataProviderOptions } from "@refinedev/rest";
 import { BACKEND_BASE_URL } from "@/constants";
 import { CreateResponse, ListResponse } from "@/types";
 import { HttpError } from "@refinedev/core";
-import { createDataProvider, CreateDataProviderOptions } from "@refinedev/rest";
 
 if (!BACKEND_BASE_URL)
   throw new Error(
-    "BACKEND_BASE_URL is not configured. Please set VITE_BACKEND_BASE_URL in your application"
+    "BACKEND_BASE_URL is not configured. Please set VITE_BACKEND_BASE_URL in your .env file."
   );
 
 const buildHttpError = async (response: Response): Promise<HttpError> => {
-  let message = "Request failed";
+  let message = "Request failed.";
 
   try {
     const payload = (await response.json()) as { message?: string };
 
     if (payload?.message) message = payload.message;
-  } catch (error) {
-    //Ignore errrors
+  } catch {
+    // Ignore errors
   }
 
   return {
@@ -44,6 +44,12 @@ const options: CreateDataProviderOptions = {
           if (field === "department") params.department = value;
           if (field === "name" || field === "code") params.search = value;
         }
+
+        if (resource === "classes") {
+          if (field === "name") params.search = value;
+          if (field === "subject") params.subject = value;
+          if (field === "teacher") params.teacher = value;
+        }
       });
 
       return params;
@@ -65,6 +71,7 @@ const options: CreateDataProviderOptions = {
       return payload.pagination?.total ?? payload.data?.length ?? 0;
     },
   },
+
   create: {
     getEndpoint: ({ resource }) => resource,
 
